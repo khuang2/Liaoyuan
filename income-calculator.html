@@ -8,7 +8,7 @@
 <script type="text/javascript" src="Employee.js"></script>
 <script type = "text/javascript">
 
-function display()
+function calculate() //计算并显示员工收入信息
 {
 var employees = [];
 var averageWage = [];
@@ -87,7 +87,7 @@ for(var i=1; i < employees.length; i++ ){
   
 }
 
-function parse(file){
+function parse(file){ //读取文件，processData用以解析数据
     var result = [];
     arrs=$.ajax({
         type: "GET",
@@ -129,14 +129,14 @@ table, th, td {
 </style>
 </head>
 
-<body onload="display()">
+<body onload="calculate()">
 
     <table id="employees">
     
     </table>
     <br>
 
-    <button onclick="display()">更新员工信息</button>
+    <button onclick="calculate()">更新员工信息</button>
     （可在输入栏中更改员工岗位工资、绩效评分、住房公积金百分比）
     
 
