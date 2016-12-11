@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>员工收入计算</title>
+
+<script type="text/javascript" src="jquery-3.1.1.min.js"></script>
+<script type="text/javascript" src="Employee.js"></script>
+<script type = "text/javascript">
+
+function display()
+{
+var employees = [];
+var averageWage = [];
+var bonusLevel = [];
+var individualTaxRate = [];
+var insuranceRate = [];
+employees = parse("employees.csv");
+averageWage = parse("average.csv");
+bonusLevel = parse("bonus.csv");
+individualTaxRate = parse("tax.csv");
+insuranceRate = parse("insurance.csv");
+
+var myTable="<tr><th>姓名</th><th>岗位工资</th><th>绩效</th><th>住房公积金比例</th><th>绩效工资</th><th>五险一金（个人）</th><th>五险一金（单位）</th><th>税前收入</th><th>扣税</th><th>税后收入</th></tr>";
+
+for(var i=1; i < employees.length; i++ ){
+    employee = employees[i];
+    var name = employee[0];
+    
+    var wageName = "wage"+i;
+    var levelName = "level"+i;
+    var houseRateName = "houseRate"+i;
+
+    
+    var wage;
+    if(document.getElementById(wageName)==null){
+        wage = +employee[1];
+    }else{
+        wage =+ document.getElementById(wageName).value;
+    }
+    
+    var level;
+    if(document.getElementById(levelName)==null){
+        level = employee[2];
+    }else{
+        level = document.getElementById(levelName).value;
+    }
+ 
+    
+    //console.log(level+i);
+    
+    var houseRate;
+    if(document.getElementById(houseRateName)==null){
+        houseRate = +employee[3];
+    }else{
+        houseRate =+ document.getElementById(houseRateName).value;
+    }
+    
+    var bonus;
+    for(var k=0; k < bonusLevel[0].length; k++){
+        if(level == bonusLevel[0][k]){
+            bonus = +bonusLevel[1][k];
+            break;
+        }
+    }
+    var theEmployee = new Employee(name, wage, bonus, houseRate, level);
+    theEmployee.setInsurance(insuranceRate, averageWage[1]);
+    theEmployee.setIncomeBeforeTax();
+    theEmployee.setTax(individualTaxRate);
+    theEmployee.setIncomeAfterTax();
+
+    
+    myTable+="<tr><td>"+theEmployee.name+"</td><td>"
+                        +'<input type="text" id='+wageName+" value="+theEmployee.wage+">"+"</td><td>"
+                        +'<input type="text" id='+levelName+" value="+theEmployee.level+">"+"</td><td>"
+                        +'<input type="text" id='+houseRateName+" value="+theEmployee.houseRate+">"+"</td><td>"
+                        +theEmployee.bonus+"</td><td>"
+                        +theEmployee.personalInsurance+"</td><td>"
+                        +theEmployee.companyInsurance+"</td><td>"
+                        +theEmployee.incomeBeforeTax+"</td><td>"
+                        +theEmployee.tax+"</td><td>"
+                        +theEmployee.incomeAfterTax+"</td></tr>";
+    
+
+}
+    document.getElementById("employees").innerHTML = myTable;
+  
+}
+
+function parse(file){
+    var result = [];
+    arrs=$.ajax({
+        type: "GET",
+        url: file,
+        async: false,
+        dataType: "text",
+        success: function(data) {result = processData(data);}
+     });
+     return result;
+}
+
+function processData(allText) {
+
+    var allTextLines = allText.split(/\r\n|\n/);
+
+    var objs = [];
+    for (var i=0; i<allTextLines.length; i++) {
+        var data = allTextLines[i].split(',');
+        
+
+            var obj = [];
+            for (var j=0; j<data.length; j++) {
+
+                obj.push(data[j]);
+                
+            }
+            objs.push(obj);
+        
+    }
+    return objs;
+}    
+
+</script>
+
+<style>
+table, th, td {
+    border: 1px solid black;
+}
+</style>
+</head>
+
+<body onload="display()">
+
+    <table id="employees">
+    
+    </table>
+    <br>
+
+    <button onclick="display()">更新员工信息</button>
+    （可更改员工岗位工资、绩效评分、住房公积金百分比）
+    
+
+
+</body>
+</html> 
